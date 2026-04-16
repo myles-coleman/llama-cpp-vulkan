@@ -30,7 +30,10 @@ RUN cmake -B build \
     -DGGML_VULKAN=1 \
     -DLLAMA_CURL=ON \
     -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build build --config Release -j$(nproc)
+    -DBUILD_SHARED_LIBS=ON \
+    && cmake --build build --config Release -j$(nproc) \
+    && mkdir -p /build/llama.cpp/build/dist/lib \
+    && find /build/llama.cpp/build -name '*.so*' -exec cp -P {} /build/llama.cpp/build/dist/lib/ \;
 
 # --- Runtime stage ---
 FROM ubuntu:24.04
@@ -45,7 +48,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy built binaries and shared libraries
 COPY --from=builder /build/llama.cpp/build/bin/llama-server /usr/local/bin/llama-server
 COPY --from=builder /build/llama.cpp/build/bin/llama-cli /usr/local/bin/llama-cli
-COPY --from=builder /build/llama.cpp/build/lib/ /usr/local/lib/
+COPY --from=builder /build/llama.cpp/build/dist/lib/ /usr/local/lib/
 RUN ldconfig
 
 # Create non-root user
