@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     libvulkan-dev \
     glslang-tools \
+    glslc \
     libcurl4-openssl-dev \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
