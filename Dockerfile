@@ -31,6 +31,9 @@ RUN cmake -B build \
     -DLLAMA_CURL=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=ON \
+    -DGGML_NATIVE=OFF \
+    -DCMAKE_C_FLAGS="-mcpu=cortex-a76" \
+    -DCMAKE_CXX_FLAGS="-mcpu=cortex-a76" \
     && cmake --build build --config Release -j$(nproc) \
     && mkdir -p /build/llama.cpp/build/dist/lib \
     && find /build/llama.cpp/build -name '*.so*' -exec cp -P {} /build/llama.cpp/build/dist/lib/ \;
