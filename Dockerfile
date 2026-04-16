@@ -42,9 +42,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy built binaries
+# Copy built binaries and shared libraries
 COPY --from=builder /build/llama.cpp/build/bin/llama-server /usr/local/bin/llama-server
 COPY --from=builder /build/llama.cpp/build/bin/llama-cli /usr/local/bin/llama-cli
+COPY --from=builder /build/llama.cpp/build/lib/ /usr/local/lib/
+RUN ldconfig
 
 # Create non-root user
 RUN groupadd -g 1001 llama && \
