@@ -42,6 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvulkan1 \
     mesa-vulkan-drivers \
     libcurl4t64 \
+    libgomp1 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -49,7 +50,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=builder /build/llama.cpp/build/bin/llama-server /usr/local/bin/llama-server
 COPY --from=builder /build/llama.cpp/build/bin/llama-cli /usr/local/bin/llama-cli
 COPY --from=builder /build/llama.cpp/build/dist/lib/ /usr/local/lib/
-RUN ldconfig
+RUN ldconfig && \
+    echo "=== Checking llama-server deps ===" && \
+    ldd /usr/local/bin/llama-server && \
+    ! ldd /usr/local/bin/llama-server | grep "not found" && \
+    echo "=== Checking llama-cli deps ===" && \
+    ldd /usr/local/bin/llama-cli && \
+    ! ldd /usr/local/bin/llama-cli | grep "not found" && \
+    echo "=== All dependencies satisfied ==="
 
 # Create non-root user
 RUN groupadd -g 1001 llama && \
