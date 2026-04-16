@@ -10,6 +10,7 @@
 FROM ubuntu:24.04 AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     cmake \
     git \
     libvulkan-dev \
