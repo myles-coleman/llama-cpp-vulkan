@@ -47,8 +47,8 @@ COPY --from=builder /build/llama.cpp/build/bin/llama-server /usr/local/bin/llama
 COPY --from=builder /build/llama.cpp/build/bin/llama-cli /usr/local/bin/llama-cli
 
 # Create non-root user
-RUN groupadd -g 1000 llama && \
-    useradd -u 1000 -g llama -m llama
+RUN groupadd -g 1001 llama && \
+    useradd -u 1001 -g llama -m llama
 
 USER llama
 
