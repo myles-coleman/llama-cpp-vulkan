@@ -1,10 +1,10 @@
-# Multi-stage build for llama.cpp with Vulkan support (ARM64)
+# Multi-stage build for llama.cpp with Vulkan support (multi-arch)
 #
 # Builds llama-server and llama-cli with Vulkan GPU acceleration
-# for use on ARM64 hosts with AMD GPUs (via Mesa RADV driver).
+# for use on ARM64 or AMD64 hosts with Vulkan-capable GPUs.
 #
 # Usage:
-#   docker buildx build --platform linux/arm64 -t llama-cpp-vulkan .
+#   docker buildx build --platform linux/arm64,linux/amd64 -t llama-cpp-vulkan .
 
 # --- Builder stage ---
 FROM ubuntu:24.04 AS builder
@@ -26,14 +26,20 @@ RUN git clone --depth 1 https://github.com/ggerganov/llama.cpp.git /build/llama.
 
 WORKDIR /build/llama.cpp
 
-RUN cmake -B build \
-    -DGGML_VULKAN=1 \
-    -DLLAMA_CURL=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DBUILD_SHARED_LIBS=ON \
-    -DGGML_NATIVE=OFF \
-    -DCMAKE_C_FLAGS="-mcpu=cortex-a76" \
-    -DCMAKE_CXX_FLAGS="-mcpu=cortex-a76" \
+ARG TARGETARCH
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+      CPU_FLAGS="-mcpu=cortex-a76"; \
+    else \
+      CPU_FLAGS=""; \
+    fi && \
+    cmake -B build \
+      -DGGML_VULKAN=1 \
+      -DLLAMA_CURL=ON \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=ON \
+      -DGGML_NATIVE=OFF \
+      ${CPU_FLAGS:+-DCMAKE_C_FLAGS="$CPU_FLAGS"} \
+      ${CPU_FLAGS:+-DCMAKE_CXX_FLAGS="$CPU_FLAGS"} \
     && cmake --build build --config Release -j$(nproc) \
     && mkdir -p /build/llama.cpp/build/dist/lib \
     && find /build/llama.cpp/build -name '*.so*' -exec cp -P {} /build/llama.cpp/build/dist/lib/ \;
