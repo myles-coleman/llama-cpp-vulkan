@@ -1,0 +1,21 @@
+services:
+  llama-server:
+    image: beebecomebigbee/llama-cpp-vulkan:latest
+    ports:
+      - "8080:8080"
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    volumes:
+      - ./models:/models
+    environment:
+      - MODEL=${MODEL:-/models/model.gguf}
+    command:
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8080"
+      - -m
+      - ${MODEL:-/models/model.gguf}
+      - -ngl
+      - "99"
+    restart: unless-stopped
