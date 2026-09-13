@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Clone llama.cpp and build with Vulkan + curl support
 # Using v0.4.0+ for qwen4exp architecture support (added in b10660, fixed in b10819)
-RUN git clone --depth 1 --branch master https://github.com/ggerganov/llama.cpp.git /build/llama.cpp
+RUN git clone --depth 1 --branch v0.4.0 https://github.com/ggerganov/llama.cpp.git /build/llama.cpp
 
 WORKDIR /build/llama.cpp
 
